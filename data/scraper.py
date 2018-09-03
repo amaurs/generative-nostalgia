@@ -1,6 +1,7 @@
 from requests import get
 from requests.exceptions import RequestException
 from contextlib import closing
+from googletrans import Translator
 from bs4 import BeautifulSoup
 
 LINK_TEMPLATE = "http://www.morellajimenez.com.do/%s"
@@ -281,7 +282,9 @@ def main():
     """
     Parses and filters content for the bolero songs.
     """
-    file = open("boleros.txt","w") 
+    es_file = open("../server/boleros_es.txt","w")
+    en_file = open("../server/boleros_en.txt","w")
+    translator = Translator()
     for link in list(set(LINKS)):
         try:
             final_link = LINK_TEMPLATE % link
@@ -298,10 +301,14 @@ def main():
                 else:
                     if not "Autor" in sentence:
                         song = song + " " + sentence
-            file.write(song.strip() + "\n") 
+            
+            translation = translator.translate(song, src='es', dest='en')
+            es_file.write(song.strip() + "\n") 
+            en_file.write(translation.text.strip() + "\n")
         except Exception as e:
             log_error(e)
-    file.close() 
+    es_file.close()
+    en_file.close()
 
 if __name__ == '__main__':
     main()
