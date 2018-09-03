@@ -22,9 +22,12 @@
             width: 100%;
         }
         .tile {
-            color: black;
+            color: gold;
             font-family: Futura, sans-serif;
             font-size: 28px;
+        }
+        .leaflet-overlay-pane {
+            z-index: 0;
         }
     </style>
 </head>
@@ -42,6 +45,8 @@
             tile.innerHTML = json['sentence'];
         });
     }
+
+
 
     L.GridLayer.Boleros = L.GridLayer.extend({
         createTile: function (coords, done) {
@@ -68,13 +73,24 @@
 
 
     var map = L.map('map', {
-        center: [21.682964, -101.773240],
-        zoom: 4
+        center: [800, 600],
+        zoom: 0,
+        minZoom: -4,
+        crs: L.CRS.Simple,
+        zoomControl: false,
+        scrollWheelZoom: false
     });
-    var Esri_WorldPhysical = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Physical_Map/MapServer/tile/{z}/{y}/{x}', {
-        attribution: 'Tiles &copy; Esri &mdash; Source: US National Park Service',
-        maxZoom: 8
-    }).addTo(map);
+
+    var bounds = [[0,0], [1600,1200]];
+
+    var images = [];
+
+    for(var i = 1 ; i <= 10; i++) {
+        images.push(L.imageOverlay('./images/' + i + '.jpg', bounds));
+    }
+
+
+    var image = images[7].addTo(map);
 
     var esLayer = L.gridLayer.debugCoords({language:"es"}).addTo(map);
     var enLayer = L.gridLayer.debugCoords({language:"en"});
