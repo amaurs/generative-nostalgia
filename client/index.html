@@ -90,13 +90,23 @@
     }
 
 
-    var image = images[7].addTo(map);
+    var currentImage = images[7].addTo(map);
 
     var esLayer = L.gridLayer.debugCoords({language:"es"}).addTo(map);
     var enLayer = L.gridLayer.debugCoords({language:"en"});
 
     L.control.layers({"es": esLayer,
                       "en": enLayer}, {}).addTo(map);
+    var zoom = 0;
+
+    setInterval(function(){
+        var i = Math.floor( Math.random() * 10 );
+        map.removeLayer(currentImage);
+        currentImage = images[i];
+        map.addLayer(currentImage);
+        zoom = (zoom + 1) % 2;
+        map.setZoom(zoom);
+    }, 2000);
 
 </script>
 </body>
