@@ -61,12 +61,16 @@
 
 <script type="text/javascript">
 
+    var image_num = 20;
+    var state = {img: Math.ceil(Math.random() * image_num),
+                 lng: "es"};
+
     function getRandomSentence(tile, language) {
-        fetch('http://localhost:2303/boleros/' + language)
+        fetch("http://localhost:2303/boleros/" + language)
         .then(function(response) {
           return response.json();
         }).then(function(json) {
-            tile.innerHTML = json['sentence'];
+            tile.innerHTML = json["sentence"];
         });
     }
 
@@ -78,7 +82,7 @@
             var text = document.createElement("span");
             var response = getRandomSentence(text, language);
             var content = "unavailable";
-            image.src = "./images/7-small.jpg";
+            image.src = "./images/" + state.img + "-small.jpg";
             if(response != null){
                 content = response["sentence"];
             }
@@ -88,11 +92,8 @@
             setTimeout(function () {
                     done(null, text);
             }, Math.random() * 500);
-
-
             container.appendChild(image);
             container.appendChild(text);
-
             return container;
         }
     });
@@ -114,37 +115,24 @@
     var esLayer = L.gridLayer.debugCoords({language:"es", tileSize: L.point(800, 600)}).addTo(map);
     var enLayer = L.gridLayer.debugCoords({language:"en", tileSize: L.point(800, 600)});
 
+    var layers = {"es": esLayer,
+                  "en": enLayer}
 
-    L.Control.Layers.include({
-        getOverlays: function() {
-            console.log("Function was called.");
-            this._layers.forEach(function(obj) {
-                console.log(obj);
-            });
-        }
-    });
-
-
-    var layerControl = 
-        L.control.layers({"es": esLayer,
-                          "en": enLayer}, 
-                          {}).addTo(map);
+    var layerControl = L.control.layers(layers, {}).addTo(map);
 
 
     setInterval(function(){
         var i = Math.floor( Math.random() * 10 );
-        layerControl.getOverlays();
-        
-        //map.removeLayer(currentImage);
-        
-        map.removeLayer(esLayer);
-        
-        //currentImage = images[i];
-        //map.addLayer(currentImage);
-        map.addLayer(esLayer);
-    }, 500000);
+        Object.assign(state, {img: Math.ceil( Math.random() * image_num )});
+        map.removeLayer(layers[state.lng]);
+        map.addLayer(layers[state.lng]);
+    }, 5000);
 
+    map.on('baselayerchange', function(e) {
+        Object.assign(state, {lng: e.name});
+    });
 
+    //layerControl.getOverlays();
 </script>
 </body>
 </html>
